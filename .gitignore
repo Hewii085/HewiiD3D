@@ -1,0 +1,11 @@
+Release
+*.user
+*.exp
+bin
+*.suo
+*.log
+*.ncb
+/source/client/WnetManagerClient/*.aps
+Debug
+lib
+
