@@ -17,7 +17,6 @@ LPDIRECT3DVERTEXBUFFER9 g_pVB = NULL;
 
 LRESULT WINAPI MsgProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam);
 HRESULT InitD3D(HWND hwnd);
-HRESULT InitVB();
 VOID Render();
 VOID Cleanup();
 VOID SetupMatrices();
@@ -59,33 +58,6 @@ INT WINAPI WinMain(HINSTANCE hInst, HINSTANCE, LPSTR, INT)
 
 	UnregisterClass("D3D Tutorial", wc.hInstance);
 	return 0;
-}
-
-HRESULT InitVB()
-{
-	/*CUSTOMVERTEX vertices[] =
-	{
-	{ 150.0f, 50.0f, 0.5f, 1.0f, 0xffff0000,},
-	{ 250.0f,250.0f,0.5f,1.0f,0xff00ff00,},
-	{ 50.0f, 250.0f, 0.5f, 1.0f, 0xff00ffff,},
-	};
-
-	if (FAILED(g_pd3dDevice->CreateVertexBuffer(3 * sizeof(CUSTOMVERTEX), 0, D3DFVF_CUSTOMVERTEX, D3DPOOL_DEFAULT, &g_pVB, NULL)))
-	{
-	return E_FAIL;
-	}
-
-	VOID* pVertices;
-
-	if (FAILED(g_pVB->Lock(0, sizeof(vertices), (void**)&pVertices, 0)))
-	{
-	return E_FAIL;
-	}
-
-	memcpy(pVertices, vertices, sizeof(vertices));
-	g_pVB->Unlock();
-	*/
-	return S_OK;
 }
 
 HRESULT InitD3D(HWND hWnd)
@@ -153,10 +125,6 @@ LRESULT WINAPI MsgProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam)
 		Cleanup();
 		PostQuitMessage(0);
 		return 0;
-		//case WM_PAINT:
-		//	Render();
-		//	ValidateRect(hWnd, NULL);
-		//	return 0;
 	default:
 		break;
 	}
