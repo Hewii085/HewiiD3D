@@ -9,3 +9,4 @@ bin
 Debug
 lib
 
+*.filters
