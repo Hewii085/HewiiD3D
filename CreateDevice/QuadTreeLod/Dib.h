@@ -15,3 +15,52 @@
 #define DIB_DATASIZE( a )			(DIB_LINESIZE(a) * DIB_CY(a))
 #define DIB_HEADERSIZE ( a )		(sizeof(BITMAPINFOHEADER))
 #define DIB_SIZE ( a )				(DIB_HEADERSIZE(a) + DIB_PALSIZE(a) + DIB_DATASIZE(a))
+#define DIB_DATAXY(a,x,y)           (DIB_DATA(a) + (x) * DIB_BPP(a)/8 + (y) ALOGIN_4B( DIB_CX(a) * DIB_BPP(a)/8 ))
+#define DIB_DATAXYZ_INV(a,x,y)      (DIB_DATA(a) + (x) * DIB_BPP(a)/8 + (DIB_CY(a) - (y) - 1) * ALIGN_4B( DIB_CX(a) * DIB_BPP(a)/8))
+#define DIB_DATA8XY (a,x,y)         (DIB_DATA(a) + (x) * (y) * ALIGN_4B( DIB_CX(a) ))
+#define DIB_DATA24XY (a,x,y)		(DIB_DATA(a) + (x) * 3 + (y) * ALIGN_4B( DIB_CX(a) * 3))
+#define DIB_DATA8XY_INV (a,x,y)     (DIB_DATA(a) + (x) + (DIB_CY(a) - (y) - 1) * ALIGN_4B( DIB_CX(a) ))
+#define DIB_DATA24XY_INV (a,x,y)    (DIB_DATA(a) + (x) * 3 + (DIB_CY(a) - (y) - 1) * ALIGN_4B( DIB_CX(a) * 3 ))
+
+#define DIB_ALPHAXY (a,x,y)         DIB_DATA8XY( (a) , (x) , (y) )
+#define DIB_IMAGEXY (a,x,y)         DIB_DATA24XY( (a) , (x) , (y) )
+#define DIB_ALPHAXY_INV(a,x,y)      DIB_DATA8XY_INV( (a) , (x) , (y) )
+#define DIB_IMAGEXY_INV(a,x,y)      DIB_DATA24XY_INV( (a) , (x) , (y) )
+
+//file io
+extern LPBYTE DibLoadHandle(LPSTR lpFileName);
+extern bool DibSave(LPBYTE lpDib, LPSTR lpFileName);
+
+//creation
+extern LPBYTE DibCreateEmpty(int nBitsPerPixel, int nWidth, int nHeight);
+extern LPBYTE DibCreateEmptyHandle(int nBitsPerPixel, int nWidth, int nHeight);
+extern void DibDeleteHandle(LPBYTE lpSrc);
+
+//copy
+extern LPBYTE DibDuplicate(LPBYTE lpSrc);
+extern LPBYTE DibDuplicateHandle(LPBYTE lpSrc);
+extern bool DibCopyRect(LPBYTE lpDstDib, int dstx, int dsty, LPBYTE lpSrcDib, LPRECT prcSrc);
+extern bool DibCopyRectROP(LPBYTE lpDstDib, int dstx, int dsty, LPBYTE lpSrcDib, LPRECT prcSrc, DWORD dwROP);
+extern bool DibCopy(LPBYTE lpDst, LPBYTE lpSrc);
+extern bool DibTile(LPBYTE lpSRcDib, LPBYTE lpTitleDib);
+
+//geometry
+extern LPBYTE DibFlipHandle(LPBYTE lpDib);
+extern LPBYTE DibReverseHandle(LPBYTE lpDib);
+extern LPBYTE DibRotateHandle(LPBYTE lpDib, float fDegree);
+extern LPBYTE DibResizeHandle(LPBYTE lpDib, int nNewWidth, int nNewHeight);
+extern LPBYTE DibReduce(LPBYTE lpSrcDib, int newCx, int newCy);
+
+//convert format
+extern LPBYTE DibRGB2GRAYHandle(LPBYTE lpRgbDib);
+extern LPBYTE DibGRAY2RGBHandle(LPBYTE lpGrayDib);
+
+//etc
+extern bool DibPrint(HWND hwnd, LPBYTE lpDib, LPSTR lpszDevice, int nDevide);
+extern HRGN DibCreateRegion(LPBYTE lpDib, BYTE byColr);
+extern bool DibAlphaMasking(LPBYTE lpDstDib, LPBYTE lpSrcDib, LPBYTE lpMaskDib);
+
+//filter
+extern bool DibInvert(LPBYTE lpSrcDib);
+
+
