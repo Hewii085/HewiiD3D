@@ -1,6 +1,8 @@
 #include <Windows.h>
 #include <mmsystem.h>
 #include <d3dx9.h>
+#include<stdlib.h>
+#include<stdio.h>
 
 #define SHOW_HOW_TO_USE_TCI
 
@@ -15,12 +17,12 @@ struct CUSTOMVERTEX
 
 #define D3DFVF_CUSTOMVERTEX (D3DFVF_XYZ| D3DFVF_DIFFUSE|D3DFVF_TEX1)
 
-
 LPDIRECT3D9 g_pD3D = NULL;
 LPDIRECT3DDEVICE9 g_pd3dDevice = NULL;
 LPDIRECT3DVERTEXBUFFER9 g_pVB = NULL;
 LPDIRECT3DTEXTURE9 g_pTexture = NULL;
 
+bool LoadTextureFromBMP(LPCSTR str);
 LRESULT WINAPI MsgProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam);
 HRESULT InitD3D(HWND hwnd);
 HRESULT InitVB();
@@ -99,34 +101,17 @@ HRESULT InitD3D(HWND hWnd)
 int a = 0;
 VOID Render()
 {
-	HMODULE
-	/*g_pTexture->Release();
+	//g_pTexture->Release();
 	if (a % 120 == 0)
 	{
-		D3DXCreateTexture(g_pd3dDevice, 500, 500, 0, D3DUSAGE_RENDERTARGET, D3DFORMAT::D3DFMT_R8G8B8, D3DPOOL::D3DPOOL_DEFAULT, &g_pTexture);
-		if (FAILED(D3DXCreateTextureFromFile(g_pd3dDevice, "lake.bmp", &g_pTexture)))
-		{
-			if (FAILED(D3DXCreateTextureFromFile(g_pd3dDevice, "..\\lake.bmp", &g_pTexture)))
-				return;
-		}
-	}
-	else if (a % 250 == 0)
-	{
-		if (FAILED(D3DXCreateTextureFromFile(g_pd3dDevice, "1325070408_1_(7).jpg", &g_pTexture)))
-		{
-			if (FAILED(D3DXCreateTextureFromFile(g_pd3dDevice, "..\\1325070408_1_(7).jpg", &g_pTexture)))
-				return;
-		}
+		LoadTextureFromBMP("lake.bmp");
 	}
 	else if (a % 450 == 0)
 	{
-		if (FAILED(D3DXCreateTextureFromFile(g_pd3dDevice, "banana.bmp", &g_pTexture)))
-		{
-			if (FAILED(D3DXCreateTextureFromFile(g_pd3dDevice, "..\\banana.bmp", &g_pTexture)))
-				return;
-		}
+		LoadTextureFromBMP("banana.bmp");
 	}
-	a++;*/
+	
+	a++;
 
 	g_pd3dDevice->Clear(0, NULL, D3DCLEAR_TARGET | D3DCLEAR_ZBUFFER, D3DCOLOR_XRGB(0, 0, 0), 1.0F, 0);
 
@@ -179,13 +164,86 @@ LRESULT WINAPI MsgProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam)
 
 }
 
+bool LoadTextureFromBMP(LPCSTR str)
+{
+	LPDIRECT3DSURFACE9	surface;
+	BITMAPFILEHEADER	bFile;
+	BITMAPINFOHEADER	bInfo;
+	D3DLOCKED_RECT	rect;
+	DWORD	w, h;
+	INT		x, y;
+	LPDWORD	data;
+	FILE	*fp = NULL;
+
+	fp = fopen(str, "rb");
+
+	//BMP 파일 헤더와 헤더 인포를 읽는다.
+	fread(&bFile, sizeof(BITMAPFILEHEADER), 1, fp);
+	fread(&bInfo, sizeof(BITMAPINFOHEADER), 1, fp);
+
+	//24bit 픽셀만 취급한다.
+	if (bInfo.biBitCount != 24)
+		goto error;
+
+	//텍스쳐 사이즈를 2의 승수에 맞춘다.
+	w = bInfo.biWidth;
+	h = bInfo.biHeight;
+
+	//텍스쳐를 만든다.
+	if (FAILED(g_pd3dDevice->CreateTexture(w, h, 0, 0, D3DFMT_A8R8G8B8, D3DPOOL_MANAGED, &g_pTexture, NULL)))
+		goto error;
+
+	//Surface를 얻어온다.
+	if (FAILED(g_pTexture->GetSurfaceLevel(0, &surface)))
+		goto error;
+
+	surface->LockRect(&rect, NULL, 0); //D3DLOCK_DISCARD);
+
+									   //BMP 데이타의 시작위치로 이동한다.
+	fseek(fp, bFile.bfOffBits, SEEK_SET);
+
+	//BMP 데이타를 카피한다(비트맵은 위아래 반대로 저장되기 때문에 아래에서부터 저장한다)
+	for (y = (int)bInfo.biHeight - 1; y >= 0; y--)
+	{
+		//Y값의 시작 위치로 이동한다.
+		data = (LPDWORD)((LPBYTE)rect.pBits + rect.Pitch * y);
+
+		for (x = 0; x<bInfo.biWidth; x++, data++)
+		{
+			BYTE	r, g, b;
+			fread(&b, sizeof(BYTE), 1, fp);
+			fread(&g, sizeof(BYTE), 1, fp);
+			fread(&r, sizeof(BYTE), 1, fp);
+
+			//불투명 칼라값을 surface에 넣는다.
+			*data = 0xff000000 | ((DWORD)r << 16) | ((DWORD)g << 8) | ((DWORD)b);
+		}
+	}
+
+	//surface의 락을 푼다.
+	surface->UnlockRect();
+
+	//surface 메모리를 해제한다.
+	//_RELEASE_<LPDIRECT3DSURFACE9>(surface);
+	surface->Release();
+
+	//열린 파일 핸들을 닫는다.
+	fclose(fp);
+
+	return true;
+
+error:
+	if (g_pTexture)
+		g_pTexture->Release();
+
+	if (fp)
+		fclose(fp);
+	return false;
+}
+
 HRESULT InitGeometry()
 {
-	if (FAILED(D3DXCreateTextureFromFile(g_pd3dDevice, "banana.bmp", &g_pTexture)))
-	{
-		if (FAILED(D3DXCreateTextureFromFile(g_pd3dDevice, "..\\banana.bmp", &g_pTexture)))
-			return E_FAIL;
-	}
+	bool isSuccess = LoadTextureFromBMP("banana.bmp");
 
 	if (FAILED(g_pd3dDevice->CreateVertexBuffer(4 * sizeof(CUSTOMVERTEX), 0, D3DFVF_CUSTOMVERTEX
 		, D3DPOOL_DEFAULT, &g_pVB, NULL)))
@@ -246,3 +304,20 @@ VOID SetupMatrices()
 	D3DXMatrixPerspectiveFovLH(&matProj, D3DX_PI / 4, 1.0f, 1.0f, 100.0f);
 	g_pd3dDevice->SetTransform(D3DTS_PROJECTION, &matProj);
 }
+
+//
+//FILE* f = fopen("banana.bmp", "r");
+//
+//if (f == NULL)
+//{
+//	int a = 0;
+//	a++;
+//}
+////fseek(f, 0, SEEK_END);
+//int len = ftell(f);
+////fseek(f, SEEK_SET, SEEK_SET);
+//LPVOID data = malloc(len);
+//fread(data, sizeof(BITMAPINFOHEADER), sizeof(BITMAPINFOHEADER), f);
+////memcpy(&bmp, f, sizeof(BITMAPFILEHEADER));
+//if (FAILED(D3DXCreateTextureFromFileInMemory(g_pd3dDevice, data, (UINT)len, &g_pTexture)))
+//return;
