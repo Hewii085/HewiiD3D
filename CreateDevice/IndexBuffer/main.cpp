@@ -222,12 +222,8 @@ VOID SetupMatrices()
 
 	D3DXMATRIXA16 matWorld;
 	D3DXMatrixIdentity(&matWorld);
-	FLOAT RSLT = timeGetTime() / 500;
-	D3DXMatrixRotationY(&matWorld, RSLT);
-	TCHAR ch[64];
-	sprintf(ch, "Rslt %f \n", RSLT);
-	OutputDebugString(ch);
-	
+	D3DXMatrixRotationY(&matWorld, GetTickCount() / 500.0f);
+
 	g_pd3dDevice->SetTransform(D3DTS_WORLD, &matWorld);
 
 
