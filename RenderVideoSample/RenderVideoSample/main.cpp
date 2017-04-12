@@ -141,9 +141,8 @@ VOID PlayVideo()
 	int bGotSound = 0;
 	pVFrame = av_frame_alloc();
 	pAFrame = av_frame_alloc();
-	int idx = 0;
+
 	while (av_read_frame(pFmtCtx, &pkt) >= 0) {
-		idx++;
 		if (pkt.stream_index == nVSI) {
 			if (avcodec_decode_video2(pVCtx, pVFrame, &bGotPicture, &pkt) >= 0) {
 				if(g_pTexture != nullptr)
@@ -155,7 +154,6 @@ VOID PlayVideo()
 				}
 				AVPicture dstPic;
 				int rgbSize = avpicture_get_size(AV_PIX_FMT_RGB24, pVFrame->width, pVFrame->height);
-
 				uint8_t *buffer = (uint8_t *)malloc(rgbSize*sizeof(uint8_t));
 				avpicture_fill(&dstPic, buffer, AV_PIX_FMT_BGR24, pVFrame->width, pVFrame->height);
 				const int inLineSize[1] = { pVFrame->width };
@@ -267,7 +265,8 @@ LRESULT WINAPI MsgProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam)
 bool LoadTextureFromBMP(BYTE* buffer, int width, int height)
 {
 	LPDIRECT3DSURFACE9	surface;
-
+	//PBits : Image 를 그릴 버퍼의 첫 주소.
+	//Pitch : 한라인 바이트길이.
 	D3DLOCKED_RECT	rect;
 	DWORD	w, h;
 	INT		x, y;
