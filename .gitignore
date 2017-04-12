@@ -10,3 +10,5 @@ Debug
 lib
 
 *.filters
+*.opendb
+*.db
