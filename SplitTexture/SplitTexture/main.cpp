@@ -13,6 +13,18 @@ struct CUSTOMVERTEX
 LPDIRECT3D9 g_pD3D;
 LPDIRECT3DDEVICE9 g_pd3dDevice = NULL;
 LPDIRECT3DVERTEXBUFFER9 g_pVB = NULL;
+LPDIRECT3DTEXTURE9 g_tex[2] = { 0, };
+
+HRESULT InitTexture()
+{
+	if (FAILED(D3DXCreateTextureFromFile(g_pd3dDevice, "banana.bmp", &g_tex[0])))
+	{
+		if(FAILED(D3DXCreateTextureFromFile(g_pd3dDevice, "..\banana.bmp", &g_tex[0])))
+			return E_FAIL;
+	}
+	
+	return E_FAIL;
+}
 
 HRESULT InitVertex()
 {
@@ -62,6 +74,15 @@ VOID Cleanup()
 		g_pD3D->Release();
 }
 
+VOID Render()
+{
+
+	if (SUCCEEDED(g_pd3dDevice->BeginScene()))
+	{
+
+		g_pd3dDevice->EndScene();
+	}
+}
 
 LRESULT WINAPI MsgProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam)
 {
