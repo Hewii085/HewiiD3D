@@ -1,12 +1,12 @@
 #include <Windows.h>
 #include <d3dx9.h>
 
-struct CUSTOMVERTEX
+typedef struct CUSTOMVERTEX
 {
 	D3DXVECTOR3 position;
 	D3DCOLOR color;
 	FLOAT tu, tv;
-};
+}CUSTOMVERTEX, *LPCUSTOMVERTEX;
 
 #define D3DFVF_CUSTOMVERTEX (D3DFVF_XYZ| D3DFVF_DIFFUSE|D3DFVF_TEX1)
 
@@ -23,19 +23,55 @@ HRESULT InitTexture()
 			return E_FAIL;
 	}
 	
-	return E_FAIL;
+	return S_OK;
 }
+
+//{ ::D3DXVECTOR3(0.0f,  0.0f, 0.0f),0xffffffff, 1.0f, 1.0f },
+//{ ::D3DXVECTOR3(-1.0f, 0.0f, 0.0f), 0xffffffff, 0.0f, 1.0f },
+//{ ::D3DXVECTOR3(0.0f, 1.0f, 0.0f),0xffffffff, 1.0f, 0.0f },
+//{ ::D3DXVECTOR3(-1.0f, 1.0f, 0.0f),0xffffffff, 0.0f, 0.0f },
+
+//{ ::D3DXVECTOR3( 1.0f, 0.0f, 0.0f),0xffffffff, 1.0f, 1.0f },
+//{ ::D3DXVECTOR3( 0.0f, 0.0f, 0.0f),0xffffffff, 0.0f, 1.0f },
+//{ ::D3DXVECTOR3( 1.0f, 1.0f, 0.0f),0xffffffff, 1.0f, 0.0f },
+//{ ::D3DXVECTOR3( 0.0f, 1.0f, 0.0f),0xffffffff, 0.0f, 0.0f }
 
 HRESULT InitVertex()
 {
-	if (FAILED(g_pd3dDevice->CreateVertexBuffer(4 * sizeof(CUSTOMVERTEX), 0, D3DFVF_CUSTOMVERTEX
+	if (FAILED(g_pd3dDevice->CreateVertexBuffer(9 * sizeof(CUSTOMVERTEX), 0, D3DFVF_CUSTOMVERTEX
 		, D3DPOOL_DEFAULT, &g_pVB, NULL)))
 		return E_FAIL;
 
-	CUSTOMVERTEX* pVertices;
+	CUSTOMVERTEX vertexArry[]=
+	{
+		{ ::D3DXVECTOR3(1.0f,  0.0f, 0.0f),0xffffffff, 1.0f, 1.0f },
+		{ ::D3DXVECTOR3(0.0f,  1.0f, 0.0f),0xffffffff, 1.0f, 1.0f },
+		{ ::D3DXVECTOR3(1.0f,  1.0f, 0.0f),0xffffffff, 1.0f, 1.0f },
+/*
+		{ ::D3DXVECTOR3(0.0f,  0.0f, 0.0f),0xffffffff, 1.0f, 1.0f },
+		{ ::D3DXVECTOR3(-1.0f, 0.0f, 0.0f),0xffffffff, 0.0f, 1.0f },
+		{ ::D3DXVECTOR3( 0.0f, 1.0f, 0.0f),0xffffffff, 1.0f, 0.0f },*/
+		//{ ::D3DXVECTOR3(-1.0f, 1.0f, 0.0f),0xffffffff, 0.0f, 0.0f }/,
+
+		//{ ::D3DXVECTOR3( 1.0f, 0.0f, 0.0f),0xffffffff, 1.0f, 1.0f },
+		//{ ::D3DXVECTOR3( 0.0f, 0.0f, 0.0f),0xffffffff, 0.0f, 1.0f },
+		//{ ::D3DXVECTOR3( 1.0f, 1.0f, 0.0f),0xffffffff, 1.0f, 0.0f },
+		//{ ::D3DXVECTOR3( 0.0f, 1.0f, 0.0f),0xffffffff, 0.0f, 0.0f }
+
+		/*{ ::D3DXVECTOR3(  0.0f, 0.0f, 0.0f),0xffffffff, 0.0f, 1.0f },
+		{ ::D3DXVECTOR3(  0.0f, 1.0f, 0.0f),0xffffffff, 1.0f, 0.0f },
+		{ ::D3DXVECTOR3( -1.0f, 1.0f, 0.0f),0xffffffff, 0.0f, 0.0f }*/
+		//{ ::D3DXVECTOR3( -1.0f, 0.0f, 0.0f),0xffffffff, 1.0f, 1.0f}
+	};
+
+	VOID* pVertices;
 
 	if (FAILED(g_pVB->Lock(0, sizeof(CUSTOMVERTEX) * 4, (void**)&pVertices, 0)))
 		return E_FAIL;
+	memcpy(pVertices, vertexArry, sizeof(vertexArry));
+	g_pVB->Unlock();
+
+	return S_OK;
 }
 
 HRESULT InitD3D(HWND hWnd)
@@ -76,12 +112,25 @@ VOID Cleanup()
 
 VOID Render()
 {
+	g_pd3dDevice->Clear(0, NULL, D3DCLEAR_TARGET | D3DCLEAR_ZBUFFER, D3DCOLOR_XRGB(0, 0, 0), 1.0F, 0);
 
 	if (SUCCEEDED(g_pd3dDevice->BeginScene()))
 	{
+		g_pd3dDevice->SetTexture(0, g_tex[0]);
+		g_pd3dDevice->SetTextureStageState(0, D3DTSS_COLOROP, D3DTOP_MODULATE);
+		g_pd3dDevice->SetTextureStageState(0, D3DTSS_COLORARG1, D3DTA_TEXTURE);
+		g_pd3dDevice->SetTextureStageState(0, D3DTSS_COLORARG2, D3DTA_DIFFUSE);
+		g_pd3dDevice->SetTextureStageState(0, D3DTSS_ALPHAOP, D3DTOP_DISABLE);
+
+		g_pd3dDevice->SetStreamSource(0, g_pVB, 0, sizeof(CUSTOMVERTEX));
+		g_pd3dDevice->SetFVF(D3DFVF_CUSTOMVERTEX);
+		g_pd3dDevice->DrawPrimitive(D3DPT_TRIANGLESTRIP, 0, 1);
+		//g_pd3dDevice->DrawPrimitive(D3DPT_TRIANGLESTRIP, 4, 2);
 
 		g_pd3dDevice->EndScene();
 	}
+
+	g_pd3dDevice->Present(NULL, NULL, NULL, NULL);
 }
 
 LRESULT WINAPI MsgProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam)
@@ -111,29 +160,32 @@ INT WINAPI WinMain(HINSTANCE hInst, HINSTANCE, LPSTR, INT)
 
 	RegisterClassEx(&wc);
 
-	HWND hWnd = CreateWindow("D3D Tutorial", "D3D Tutorial 01: CreateDevice", WS_OVERLAPPEDWINDOW, 100, 100, 300, 300,
+	HWND hWnd = CreateWindow("D3D Tutorial", "D3D Tutorial 01: CreateDevice", WS_OVERLAPPEDWINDOW, 100, 100, 500, 500,
 		GetDesktopWindow(), NULL, wc.hInstance, NULL);
 
 	if (SUCCEEDED(InitD3D(hWnd)))
 	{
 
-		if (SUCCEEDED(InitVertex()))
+		if (SUCCEEDED(InitTexture()))
 		{
-			ShowWindow(hWnd, SW_SHOWDEFAULT);
-			UpdateWindow(hWnd);
-
-			MSG msg;
-			ZeroMemory(&msg, sizeof(msg));
-
-			while (msg.message != WM_QUIT)
+			if (SUCCEEDED(InitVertex()))
 			{
-				if (PeekMessage(&msg, NULL, 0U, 0U, PM_REMOVE))
+				ShowWindow(hWnd, SW_SHOWDEFAULT);
+				UpdateWindow(hWnd);
+
+				MSG msg;
+				ZeroMemory(&msg, sizeof(msg));
+
+				while (msg.message != WM_QUIT)
 				{
-					TranslateMessage(&msg);
-					DispatchMessage(&msg);
+					if (PeekMessage(&msg, NULL, 0U, 0U, PM_REMOVE))
+					{
+						TranslateMessage(&msg);
+						DispatchMessage(&msg);
+					}
+					else
+						Render();
 				}
-				//else
-					//Render();
 			}
 		}
 	}
