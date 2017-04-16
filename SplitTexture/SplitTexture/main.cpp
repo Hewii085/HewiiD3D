@@ -26,15 +26,6 @@ HRESULT InitTexture()
 	return S_OK;
 }
 
-//{ ::D3DXVECTOR3(0.0f,  0.0f, 0.0f),0xffffffff, 1.0f, 1.0f },
-//{ ::D3DXVECTOR3(-1.0f, 0.0f, 0.0f), 0xffffffff, 0.0f, 1.0f },
-//{ ::D3DXVECTOR3(0.0f, 1.0f, 0.0f),0xffffffff, 1.0f, 0.0f },
-//{ ::D3DXVECTOR3(-1.0f, 1.0f, 0.0f),0xffffffff, 0.0f, 0.0f },
-
-//{ ::D3DXVECTOR3( 1.0f, 0.0f, 0.0f),0xffffffff, 1.0f, 1.0f },
-//{ ::D3DXVECTOR3( 0.0f, 0.0f, 0.0f),0xffffffff, 0.0f, 1.0f },
-//{ ::D3DXVECTOR3( 1.0f, 1.0f, 0.0f),0xffffffff, 1.0f, 0.0f },
-//{ ::D3DXVECTOR3( 0.0f, 1.0f, 0.0f),0xffffffff, 0.0f, 0.0f }
 
 HRESULT InitVertex()
 {
@@ -44,19 +35,15 @@ HRESULT InitVertex()
 
 	CUSTOMVERTEX vertexArry[]=
 	{
-		{ ::D3DXVECTOR3(1.0f,  0.0f, 0.0f),0xffffffff, 1.0f, 1.0f },
-		{ ::D3DXVECTOR3(0.0f,  1.0f, 0.0f),0xffffffff, 1.0f, 1.0f },
-		{ ::D3DXVECTOR3(1.0f,  1.0f, 0.0f),0xffffffff, 1.0f, 1.0f },
-/*
 		{ ::D3DXVECTOR3(0.0f,  0.0f, 0.0f),0xffffffff, 1.0f, 1.0f },
 		{ ::D3DXVECTOR3(-1.0f, 0.0f, 0.0f),0xffffffff, 0.0f, 1.0f },
-		{ ::D3DXVECTOR3( 0.0f, 1.0f, 0.0f),0xffffffff, 1.0f, 0.0f },*/
-		//{ ::D3DXVECTOR3(-1.0f, 1.0f, 0.0f),0xffffffff, 0.0f, 0.0f }/,
+		{ ::D3DXVECTOR3( 0.0f, 1.0f, 0.0f),0xffffffff, 1.0f, 0.0f },
+		{ ::D3DXVECTOR3(-1.0f, 1.0f, 0.0f),0xffffffff, 0.0f, 0.0f },
 
-		//{ ::D3DXVECTOR3( 1.0f, 0.0f, 0.0f),0xffffffff, 1.0f, 1.0f },
-		//{ ::D3DXVECTOR3( 0.0f, 0.0f, 0.0f),0xffffffff, 0.0f, 1.0f },
-		//{ ::D3DXVECTOR3( 1.0f, 1.0f, 0.0f),0xffffffff, 1.0f, 0.0f },
-		//{ ::D3DXVECTOR3( 0.0f, 1.0f, 0.0f),0xffffffff, 0.0f, 0.0f }
+		{ ::D3DXVECTOR3( 1.0f, 0.0f, 0.0f),0xffffffff, 1.0f, 1.0f },
+		{ ::D3DXVECTOR3( 0.0f, 0.0f, 0.0f),0xffffffff, 0.0f, 1.0f },
+		{ ::D3DXVECTOR3( 1.0f, 1.0f, 0.0f),0xffffffff, 1.0f, 0.0f },
+		{ ::D3DXVECTOR3( 0.0f, 1.0f, 0.0f),0xffffffff, 0.0f, 0.0f }
 
 		/*{ ::D3DXVECTOR3(  0.0f, 0.0f, 0.0f),0xffffffff, 0.0f, 1.0f },
 		{ ::D3DXVECTOR3(  0.0f, 1.0f, 0.0f),0xffffffff, 1.0f, 0.0f },
@@ -124,8 +111,8 @@ VOID Render()
 
 		g_pd3dDevice->SetStreamSource(0, g_pVB, 0, sizeof(CUSTOMVERTEX));
 		g_pd3dDevice->SetFVF(D3DFVF_CUSTOMVERTEX);
-		g_pd3dDevice->DrawPrimitive(D3DPT_TRIANGLESTRIP, 0, 1);
-		//g_pd3dDevice->DrawPrimitive(D3DPT_TRIANGLESTRIP, 4, 2);
+		g_pd3dDevice->DrawPrimitive(D3DPT_TRIANGLESTRIP, 0, 2);
+		g_pd3dDevice->DrawPrimitive(D3DPT_TRIANGLESTRIP, 4, 2);
 
 		g_pd3dDevice->EndScene();
 	}
