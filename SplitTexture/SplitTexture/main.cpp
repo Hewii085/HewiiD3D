@@ -81,11 +81,12 @@
 typedef struct CUSTOMVERTEX
 {
 	D3DXVECTOR3 position;
+	FLOAT rhw;
 	D3DCOLOR color;
 	FLOAT tu, tv;
 }CUSTOMVERTEX, *LPCUSTOMVERTEX;
 
-#define D3DFVF_CUSTOMVERTEX (D3DFVF_XYZ| D3DFVF_DIFFUSE|D3DFVF_TEX1)
+#define D3DFVF_CUSTOMVERTEX (D3DFVF_XYZRHW| D3DFVF_DIFFUSE|D3DFVF_TEX1)
 
 LPDIRECT3D9 g_pD3D;
 LPDIRECT3DDEVICE9 g_pd3dDevice = NULL;
@@ -107,31 +108,36 @@ HRESULT InitTexture()
 
 HRESULT InitVertex()
 {
-	if (FAILED(g_pd3dDevice->CreateVertexBuffer(9 * sizeof(CUSTOMVERTEX), 0, D3DFVF_CUSTOMVERTEX
+	if (FAILED(g_pd3dDevice->CreateVertexBuffer(16 * sizeof(CUSTOMVERTEX), 0, D3DFVF_CUSTOMVERTEX
 		, D3DPOOL_DEFAULT, &g_pVB, NULL)))
 		return E_FAIL;
 
 	CUSTOMVERTEX vertexArry[]=
 	{
-		{ ::D3DXVECTOR3( 0.0f,  0.0f, 0.0f),0xffffffff, 1.0f, 1.0f },
-		{ ::D3DXVECTOR3(-1.0f, 0.0f, 0.0f),0xffffffff, 0.0f, 1.0f },
-		{ ::D3DXVECTOR3( 0.0f, 1.0f, 0.0f),0xffffffff, 1.0f, 0.0f },
-		{ ::D3DXVECTOR3(-1.0f, 1.0f, 0.0f),0xffffffff, 0.0f, 0.0f },
+		{ ::D3DXVECTOR3( 0.0f,  300.0f, 0.0f),0.5f,0xffffffff, 1.0f, 1.0f },
+		{ ::D3DXVECTOR3( 0.0f, 0.0f, 0.0f),0.5f,0xffffffff, 0.0f, 1.0f },
+		{ ::D3DXVECTOR3( 400.0f, 300.0f, 0.0f),0.5f,0xffffffff, 1.0f, 0.0f },
+		{ ::D3DXVECTOR3( 400.0f, 0.0f, 0.0f),0.5f,0xffffffff, 0.0f, 0.0f },
 
-		{ ::D3DXVECTOR3( 1.0f, 0.0f, 0.0f),0xffffffff, 1.0f, 1.0f },
-		{ ::D3DXVECTOR3( 0.0f, 0.0f, 0.0f),0xffffffff, 0.0f, 1.0f },
-		{ ::D3DXVECTOR3( 1.0f, 1.0f, 0.0f),0xffffffff, 1.0f, 0.0f },
-		{ ::D3DXVECTOR3( 0.0f, 1.0f, 0.0f),0xffffffff, 0.0f, 0.0f }
+		{ ::D3DXVECTOR3( 400.0f, 300.0f, 0.0f),0.0f,0xffffffff, 1.0f, 1.0f },
+		{ ::D3DXVECTOR3( 400.0f, 0.0f, 0.0f),0.0f,0xffffffff, 0.0f, 1.0f },
+		{ ::D3DXVECTOR3( 800.0f, 300.0f, 0.0f),0.0f,0xffffffff, 1.0f, 0.0f },
+		{ ::D3DXVECTOR3( 800.0f, 0.0f, 0.0f),0.0f,0xffffffff, 0.0f, 0.0f },
 
-		/*{ ::D3DXVECTOR3(  0.0f, 0.0f, 0.0f),0xffffffff, 0.0f, 1.0f },
-		{ ::D3DXVECTOR3(  0.0f, 1.0f, 0.0f),0xffffffff, 1.0f, 0.0f },
-		{ ::D3DXVECTOR3( -1.0f, 1.0f, 0.0f),0xffffffff, 0.0f, 0.0f }*/
-		//{ ::D3DXVECTOR3( -1.0f, 0.0f, 0.0f),0xffffffff, 1.0f, 1.0f}
+		{ ::D3DXVECTOR3(0.0f, 600.0f, 0.0f),0.0f,0xffffffff, 1.0f, 1.0f },
+		{ ::D3DXVECTOR3(0.0f, 300.0f, 0.0f),0.0f,0xffffffff, 0.0f, 1.0f },
+		{ ::D3DXVECTOR3(400.0f, 600.0f, 0.0f),0.0f,0xffffffff, 1.0f, 0.0f },
+		{ ::D3DXVECTOR3(400.0f, 300.0f, 0.0f),0.0f,0xffffffff, 0.0f, 0.0f },
+
+		{ ::D3DXVECTOR3(  800.0f, 300.0f, 0.0f),0.5f,0xffffffff, 0.0f, 1.0f },
+		{ ::D3DXVECTOR3(  800.0f, 600.0f, 0.0f),0.5f,0xffffffff, 1.0f, 0.0f },
+		{ ::D3DXVECTOR3(  400.0f, 600.0f, 0.0f),0.5f,0xffffffff, 0.0f, 0.0f },
+		{ ::D3DXVECTOR3(  400.0f, 300.0f, 0.0f),0.5f,0xffffffff, 1.0f, 1.0f}
 	};
 
 	VOID* pVertices;
 
-	if (FAILED(g_pVB->Lock(0, sizeof(CUSTOMVERTEX) * 4, (void**)&pVertices, 0)))
+	if (FAILED(g_pVB->Lock(0, sizeof(vertexArry), (void**)&pVertices, 0)))
 		return E_FAIL;
 	memcpy(pVertices, vertexArry, sizeof(vertexArry));
 	g_pVB->Unlock();
@@ -159,9 +165,9 @@ HRESULT InitD3D(HWND hWnd)
 		hWnd, D3DCREATE_SOFTWARE_VERTEXPROCESSING, &d3dpp, &g_pd3dDevice)))
 		return E_FAIL;
 
-	g_pd3dDevice->SetRenderState(D3DRS_CULLMODE, D3DCULL_NONE);
-	g_pd3dDevice->SetRenderState(D3DRS_LIGHTING, FALSE);
-	g_pd3dDevice->SetRenderState(D3DRS_ZENABLE, TRUE);
+	 //g_pd3dDevice->SetRenderState(D3DRS_CULLMODE, D3DCULL_NONE);
+	 //g_pd3dDevice->SetRenderState(D3DRS_LIGHTING, FALSE);
+	// g_pd3dDevice->SetRenderState(D3DRS_ZENABLE, TRUE);
 
 	return S_OK;
 }
@@ -177,21 +183,22 @@ VOID Cleanup()
 
 VOID Render()
 {
-	g_pd3dDevice->Clear(0, NULL, D3DCLEAR_TARGET | D3DCLEAR_ZBUFFER, D3DCOLOR_XRGB(0, 0, 0), 1.0F, 0);
+	g_pd3dDevice->Clear(0, NULL, D3DCLEAR_TARGET, D3DCOLOR_XRGB(0, 0, 255), 1.0F, 0);
 
 	if (SUCCEEDED(g_pd3dDevice->BeginScene()))
 	{
 		g_pd3dDevice->SetTexture(0, g_tex[0]);
-		g_pd3dDevice->SetTextureStageState(0, D3DTSS_COLOROP, D3DTOP_MODULATE);
-		g_pd3dDevice->SetTextureStageState(0, D3DTSS_COLORARG1, D3DTA_TEXTURE);
-		g_pd3dDevice->SetTextureStageState(0, D3DTSS_COLORARG2, D3DTA_DIFFUSE);
-		g_pd3dDevice->SetTextureStageState(0, D3DTSS_ALPHAOP, D3DTOP_DISABLE);
+		//g_pd3dDevice->SetTextureStageState(0, D3DTSS_COLOROP, D3DTOP_MODULATE);
+		//g_pd3dDevice->SetTextureStageState(0, D3DTSS_COLORARG1, D3DTA_TEXTURE);
+		//g_pd3dDevice->SetTextureStageState(0, D3DTSS_COLORARG2, D3DTA_DIFFUSE);
+		//g_pd3dDevice->SetTextureStageState(0, D3DTSS_ALPHAOP, D3DTOP_DISABLE);
 
 		g_pd3dDevice->SetStreamSource(0, g_pVB, 0, sizeof(CUSTOMVERTEX));
 		g_pd3dDevice->SetFVF(D3DFVF_CUSTOMVERTEX);
 		g_pd3dDevice->DrawPrimitive(D3DPT_TRIANGLESTRIP, 0, 2);
 		g_pd3dDevice->DrawPrimitive(D3DPT_TRIANGLESTRIP, 4, 2);
-
+		g_pd3dDevice->DrawPrimitive(D3DPT_TRIANGLESTRIP, 8, 2);
+		g_pd3dDevice->DrawPrimitive(D3DPT_TRIANGLESTRIP, 12, 2);
 		g_pd3dDevice->EndScene();
 	}
 
@@ -225,7 +232,7 @@ INT WINAPI WinMain(HINSTANCE hInst, HINSTANCE, LPSTR, INT)
 
 	RegisterClassEx(&wc);
 
-	HWND hWnd = CreateWindow("D3D Tutorial", "D3D Tutorial 01: CreateDevice", WS_OVERLAPPEDWINDOW, 100, 100, 500, 500,
+	HWND hWnd = CreateWindow("D3D Tutorial", "D3D Tutorial 01: CreateDevice", WS_OVERLAPPEDWINDOW, 100, 100, 800, 600,
 		GetDesktopWindow(), NULL, wc.hInstance, NULL);
 
 	if (SUCCEEDED(InitD3D(hWnd)))
