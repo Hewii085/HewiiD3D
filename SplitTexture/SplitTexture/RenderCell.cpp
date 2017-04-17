@@ -9,6 +9,7 @@ RenderCell::~RenderCell()
 {
 
 }
+
 HRESULT RenderCell::SetPosition(float x, float y, float z)
 {
 	if (FAILED(m_pd3dDevice->CreateVertexBuffer(sizeof(CUSTOMVERTEX), 0, D3DFVF_CUSTOMVERTEX

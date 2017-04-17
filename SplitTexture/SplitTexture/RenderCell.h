@@ -4,12 +4,13 @@
 #include <d3d9.h>
 #include <stdio.h>
 
-struct CUSTOMVERTEX
+typedef struct CUSTOMVERTEX
 {
 	D3DXVECTOR3 pos;
 	D3DCOLOR color;
 	FLOAT tu, tv;
-};
+
+}CUSTOMVERTEX, *LPCUSTOMVERTEX;
 
 #define D3DFVF_CUSTOMVERTEX (D3DFVF_XYZ| D3DFVF_DIFFUSE|D3DFVF_TEX1)
 

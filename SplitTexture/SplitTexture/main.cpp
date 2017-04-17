@@ -1,3 +1,80 @@
+//#include <Windows.h>
+//#include <d3dx9.h>
+//#include "RenderCell.h"
+//
+//#define RENDERLISTSIZE 4
+//#define VERTEXCOUNT 9
+//
+//D3DXVECTOR3 vertecArry[VERTEXCOUNT]
+//= {
+//	::D3DXVECTOR3(-1.0f,  1.0f, 0.0f),
+//	::D3DXVECTOR3( 0.0f,  1.0f, 0.0f),
+//	::D3DXVECTOR3( 1.0f,  1.0f, 0.0f),
+//	::D3DXVECTOR3(-1.0f,  0.0f, 0.0f),
+//	::D3DXVECTOR3( 0.0f,  0.0f, 0.0f),
+//	::D3DXVECTOR3( 1.0f,  0.0f, 0.0f),
+//	::D3DXVECTOR3(-1.0f, -1.0f, 0.0f),
+//	::D3DXVECTOR3( 0.0f, -1.0f, 0.0f),
+//	::D3DXVECTOR3( 1.0f, -1.0f, 0.0f),
+//  };
+//
+//RenderCell renderArry[4];
+//
+//VOID Render()
+//{
+//	for (int i = 0; i < RENDERLISTSIZE; i++)
+//	{
+//		renderArry[i].Render();
+//	}
+//}
+//
+//
+//LRESULT WINAPI MsgProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam)
+//{
+//	switch (msg)
+//	{
+//	case WM_DESTROY:
+//		PostQuitMessage(0);
+//		return 0;
+//	default:
+//		break;
+//	}
+//
+//	return DefWindowProc(hWnd, msg, wParam, lParam);
+//
+//}
+//
+//INT WINAPI WinMain(HINSTANCE hInst, HINSTANCE, LPSTR, INT)
+//{
+//	WNDCLASSEX wc = { sizeof(WNDCLASSEX), CS_CLASSDC, MsgProc, 0L, 0L, GetModuleHandle(NULL), NULL,
+//		NULL,NULL,NULL, "D3D Tutorial",NULL };
+//
+//	RegisterClassEx(&wc);
+//
+//	HWND hWnd = CreateWindow("D3D Tutorial", "D3D Tutorial 01: CreateDevice", WS_OVERLAPPEDWINDOW, 100, 100, 500, 500,
+//		GetDesktopWindow(), NULL, wc.hInstance, NULL);
+//
+//
+//	ShowWindow(hWnd, SW_SHOWDEFAULT);
+//	UpdateWindow(hWnd);
+//
+//	MSG msg;
+//	ZeroMemory(&msg, sizeof(msg));
+//
+//	while (msg.message != WM_QUIT)
+//	{
+//		if (PeekMessage(&msg, NULL, 0U, 0U, PM_REMOVE))
+//		{
+//			TranslateMessage(&msg);
+//			DispatchMessage(&msg);
+//		}
+//	}
+//
+//	UnregisterClass("D3D Tutorial", wc.hInstance);
+//	return 0;
+//}
+
+
 #include <Windows.h>
 #include <d3dx9.h>
 
@@ -14,6 +91,7 @@ LPDIRECT3D9 g_pD3D;
 LPDIRECT3DDEVICE9 g_pd3dDevice = NULL;
 LPDIRECT3DVERTEXBUFFER9 g_pVB = NULL;
 LPDIRECT3DTEXTURE9 g_tex[2] = { 0, };
+
 
 HRESULT InitTexture()
 {
@@ -35,7 +113,7 @@ HRESULT InitVertex()
 
 	CUSTOMVERTEX vertexArry[]=
 	{
-		{ ::D3DXVECTOR3(0.0f,  0.0f, 0.0f),0xffffffff, 1.0f, 1.0f },
+		{ ::D3DXVECTOR3( 0.0f,  0.0f, 0.0f),0xffffffff, 1.0f, 1.0f },
 		{ ::D3DXVECTOR3(-1.0f, 0.0f, 0.0f),0xffffffff, 0.0f, 1.0f },
 		{ ::D3DXVECTOR3( 0.0f, 1.0f, 0.0f),0xffffffff, 1.0f, 0.0f },
 		{ ::D3DXVECTOR3(-1.0f, 1.0f, 0.0f),0xffffffff, 0.0f, 0.0f },
@@ -74,8 +152,8 @@ HRESULT InitD3D(HWND hWnd)
 	d3dpp.Windowed = TRUE;
 	d3dpp.SwapEffect = D3DSWAPEFFECT_DISCARD;
 	d3dpp.BackBufferFormat = D3DFMT_UNKNOWN;
-	d3dpp.EnableAutoDepthStencil = TRUE;
-	d3dpp.AutoDepthStencilFormat = D3DFMT_D16;
+	//d3dpp.EnableAutoDepthStencil = TRUE;
+	//d3dpp.AutoDepthStencilFormat = D3DFMT_D16;
 
 	if (FAILED(g_pD3D->CreateDevice(D3DADAPTER_DEFAULT, D3DDEVTYPE_HAL,
 		hWnd, D3DCREATE_SOFTWARE_VERTEXPROCESSING, &d3dpp, &g_pd3dDevice)))
