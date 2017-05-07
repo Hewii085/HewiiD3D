@@ -213,7 +213,53 @@ bool DibCopyRect(LPBYTE lpDstDib, int dstx, int dsty, LPBYTE lpSrcDib, LPRECT pr
 
 bool DibCopyRectROP(LPBYTE lpDstDib, int dstx, int dsty, LPBYTE lpSrcDib, LPRECT prSrc1, DWORD dwROP)
 {
+	if (!lpDstDib || !lpSrcDib || DIB_BPP(lpDstDib) != DIB_BPP(lpSrcDib))
+		return false;
 
+	RECT rDst, rDst1, rDst2, rSrc2, rSrc;
+
+	SetRect(&rSrc2, 0, 0, DIB_CX(lpSrcDib), DIB_CY(lpSrcDib));
+	IntersectRect(&rSrc, prSrc1, &rSrc2);
+	SetRect(&rDst1, 0, 0, rSrc.right - rSrc.left, rSrc.bottom - rSrc.top);
+	OffsetRect(&rDst1, dstx, dsty);
+	SetRect(&rDst2, 0, 0, DIB_CX(lpDstDib), DIB_CY(lpDstDib));
+	IntersectRect(&rDst, &rDst1, &rDst2);
+
+	LPBYTE lpSrc, lpDst;
+	int y, i, nWidth = (rDst.right - rDst.left)*DIB_BPP(lpSrcDib) / 8;
+
+	for (y = rDst.top; y < rDst.bottom; y++)
+	{
+		lpSrc = DIB_DATAXY_INV(lpSrcDib, rSrc.left, rSrc.top + y - rDst.top);
+		lpDst = DIB_DATAXY_INV(lpDstDib, rDst.left, y);
+
+		switch (dwROP)
+		{
+		case SRCAND:
+			for (i = 0; i < nWidth; i++)
+			{
+				*lpDst = *lpDst & *lpSrc;
+				lpDst++;
+				lpSrc++;
+			}
+			break;
+		case SRCPAINT:
+			for (i = 0; i < nWidth; i++)
+			{
+				*lpDst = *lpDst | *lpSrc;
+				lpDst++;
+				lpSrc++;
+			}
+			break;
+		case SRCCOPY:
+			memcpy(lpDst, lpSrc, nWidth);
+			break;
+		default:
+			break;
+		}
+	}
+
+	return true;
 }
 
 

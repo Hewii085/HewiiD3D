@@ -303,7 +303,7 @@ VOID Animate()
 
 	DWORD d = GetTickCount() % ((int)((D3DX_PI * 2) * 1000));
 
-	//	D3DXMatrixRotationY( &g_matAni, d / 1000.0f );
+		D3DXMatrixRotationY( &g_matAni, d / 1000.0f );
 	D3DXMatrixIdentity(&g_matAni);
 
 	LogFPS();
