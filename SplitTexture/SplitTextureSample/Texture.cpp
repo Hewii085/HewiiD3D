@@ -25,7 +25,7 @@ int CTexture::InitVB(LPDIRECT3DDEVICE9  g_pd3dDevice)
 
 	for (int i = 0; i<4; ++i)
 	{
-		sprintf_s(str, "iu%04d.bmp", i);
+		sprintf_s(str, "C:\\Users\\Bin\\Desktop\\abab.png", i);
 		D3DXCreateTextureFromFile(m_pd3dDevice, str, &m_pTexture[i]);
 	}
 

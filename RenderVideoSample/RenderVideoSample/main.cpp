@@ -100,6 +100,7 @@ struct RGBFRAME
 	int stride;
 	BYTE* data[];
 };
+
 VOID PlayVideo()
 {
 	const char *szFilePath = "C:\\Users\\Bin\\Documents\\Visual Studio 2015\\Projects\\ffmpegSample\\x64\\Debug\\somthing.mp4";
@@ -133,7 +134,7 @@ VOID PlayVideo()
 	avcodec_open2(pFmtCtx->streams[nVSI]->codec, pVideoCodec, NULL);
 	AVCodecContext *pVCtx = pFmtCtx->streams[nVSI]->codec;
 	AVCodecContext *pACtx = pFmtCtx->streams[nASI]->codec;
-	SwsContext* ctx = NULL;
+	SwsContext* ctx = NULL;//스케일러
 	AVPacket pkt;
 	AVFrame* pVFrame, *pAFrame, *rgbFrame;
 
@@ -152,12 +153,16 @@ VOID PlayVideo()
 				{
 					ctx = sws_getContext(pVFrame->width, pVFrame->height, AV_PIX_FMT_YUV420P, pVFrame->width, pVFrame->height, AV_PIX_FMT_RGB24, 0, 0, 0, 0);
 				}
+				
 				AVPicture dstPic;
 				int rgbSize = avpicture_get_size(AV_PIX_FMT_RGB24, pVFrame->width, pVFrame->height);
+				
 				uint8_t *buffer = (uint8_t *)malloc(rgbSize*sizeof(uint8_t));
 				avpicture_fill(&dstPic, buffer, AV_PIX_FMT_BGR24, pVFrame->width, pVFrame->height);
+				
 				const int inLineSize[1] = { pVFrame->width };
 				int ret = sws_scale(ctx, pVFrame->data, pVFrame->linesize, 0, pVFrame->height, dstPic.data, dstPic.linesize);
+				
 				LoadTextureFromBMP((BYTE*)buffer, pVFrame->width, pVFrame->height);
 				Render();
 				free(buffer);
@@ -169,7 +174,7 @@ VOID PlayVideo()
 			}
 		}
 
-		::Sleep(10);
+		::Sleep(30);
 		av_free_packet(&pkt);
 	}
 

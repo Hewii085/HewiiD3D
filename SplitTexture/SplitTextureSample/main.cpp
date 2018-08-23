@@ -44,7 +44,7 @@ HRESULT InitD3D(HWND hWnd)
 	d3dpp.BackBufferFormat = D3DFMT_UNKNOWN;
 
 	if (FAILED(g_pD3D->CreateDevice(D3DADAPTER_DEFAULT, D3DDEVTYPE_HAL, hWnd,
-		D3DCREATE_SOFTWARE_VERTEXPROCESSING,
+		D3DCREATE_HARDWARE_VERTEXPROCESSING,
 		&d3dpp, &g_pd3dDevice)))
 	{
 		return E_FAIL;
@@ -98,7 +98,7 @@ VOID Render()
 
 	if (SUCCEEDED(g_pd3dDevice->BeginScene()))
 	{
-		for (int i = 0; i<4; ++i)
+		for (int i = 0; i<3; ++i)
 		{
 			Texture[i].SetTexture(i);
 			Texture[i].Render();
